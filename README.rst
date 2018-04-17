@@ -1,7 +1,7 @@
-ECS Tool
+ECS Compose
 ----------
 
-`ecs-tool` docker-compose like deployments for AWS Elastic Container Service
+`ecs-compose` docker-compose like deployments for AWS Elastic Container Service
 
 Key Features
 ------------
@@ -16,7 +16,7 @@ TL;DR
 -----
 Deploy a complete ECS cluster with a single command::
 
-    $ ecs cluster deploy -n my-cluster -f my-services.yml
+    $ ecs-compose cluster deploy -n my-cluster -f my-services.yml
 
 
 You just need to specify the services that will be deployed within the cluster in a YAML file like the following
@@ -80,14 +80,14 @@ You just need to specify the services that will be deployed within the cluster i
 Installation
 ------------
 
-The project is availably on PyPI. Simply run::
+The project is available on PyPI. Simply run::
 
-    $ pip install ecs-tool
+    $ pip install ecs-compose
 
 
 Configuration
 -------------
-The mechanism in which **ecs-tool** looks for credentials is to search through a list of possible locations and stop as soon as it finds credentials.
+The mechanism in which **ecs-compose** looks for credentials is to search through a list of possible locations and stop as soon as it finds credentials.
 
 - Environment variables
 - Shared credential file (~/.aws/credentials)
@@ -97,7 +97,9 @@ The mechanism in which **ecs-tool** looks for credentials is to search through a
 - Instance metadata service on an Amazon EC2 instance that has an IAM role configured.
 
 Please read the boto3 documentation for more details
-(http://boto3.readthedocs.org/en/latest/guide/configuration.html#configuration). The simplest way is by running::
+(http://boto3.readthedocs.org/en/latest/guide/configuration.html#configuration).
+
+Or just run::
 
     $ aws configure
 
@@ -136,6 +138,6 @@ Usage
 
 For detailed information about the available actions, arguments and options, run::
 
-    $ ecs --help
-    $ ecs cluster --help
-    $ ecs service --help
+    $ ecs-compose --help
+    $ ecs-compose cluster --help
+    $ ecs-compose service --help
