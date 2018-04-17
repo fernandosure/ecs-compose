@@ -1,7 +1,7 @@
 ECS Compose
 ----------
 
-`ecs-compose` docker-compose like deployments for AWS Elastic Container Service
+docker-compose like deployments for AWS Elastic Container Service
 
 Key Features
 ------------

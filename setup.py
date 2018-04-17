@@ -2,7 +2,7 @@
     AWS ECS tools
 """
 from setuptools import find_packages, setup
-from src import VERSION
+from ecs_compose import VERSION
 
 dependencies = [
     'botocore',
@@ -12,9 +12,10 @@ dependencies = [
 ]
 
 classifiers = [
+        'Development Status :: 3 - Alpha',
         'Environment :: Console',
         'Intended Audience :: Developers',
-        'License :: OSI Approved :: BSD License',
+        'License :: OSI Approved :: MIT License',
         'Operating System :: POSIX',
         'Operating System :: MacOS',
         'Operating System :: Unix',
@@ -45,7 +46,7 @@ setup(
     install_requires=dependencies,
     entry_points={
         'console_scripts': [
-            'ecs-compose = src.cli:main',
+            'ecs-compose = ecs_compose.cli:main',
         ],
     },
     keywords=['ECS', 'AWS'],
