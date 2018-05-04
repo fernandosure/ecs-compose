@@ -33,6 +33,16 @@ You just need to specify the services that will be deployed within the cluster i
         public: ["sg-xxx"]
         private: ["sg-xxx"]
 
+    logging:
+      log_driver: gelf
+      options:
+        gelf-address: udp://logstash.osigu.dev:12201
+        tag: dev1
+
+    service_discovery:
+      namespace: {internal-namespace || local.sd}
+
+
     defaults:
       memory: 1056
       environment:
@@ -41,6 +51,14 @@ You just need to specify the services that will be deployed within the cluster i
         - LOGBACK_FORMAT: JSON
 
     services:
+      - service1:
+          image: xxx/service1:latest
+          ports:
+            - "8888:8888"
+          desired_count: 1
+          dns_discovery:
+            name: service1.env
+
       - edge:
           image: xxx/edge:latest
           ports:
@@ -51,20 +69,20 @@ You just need to specify the services that will be deployed within the cluster i
           desired_count: 2
           elb:
             -
-              type: public
-              protocol: HTTPS
-              ports:
-                public: 443
-                container: 8080
-              certificates:
-                - arn:aws:acm:us-east-1:xxxx:certificate/xxxx-xxxx-xxxx-xxx
-              dns:
-                hosted_zone_id: XXXXXX
-                record_name: api.test.com
-              healthcheck:
-                protocol: HTTP
-                port: 8081
-                path: /health
+            type: public
+            protocol: HTTPS
+            ports:
+              public: 443
+              container: 8080
+            certificates:
+              - arn:aws:acm:us-east-1:xxxx:certificate/xxxx-xxxx-xxxx-xxx
+            dns:
+              hosted_zone_id: XXXXXX
+              record_name: api.test.com
+            healthcheck:
+              protocol: HTTP
+              port: 8081
+              path: /health
 
       - auth-server:
           image: xxx/auth-server:latest
