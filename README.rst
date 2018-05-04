@@ -36,7 +36,7 @@ You just need to specify the services that will be deployed within the cluster i
     logging:
       log_driver: gelf
       options:
-        gelf-address: udp://logstash.osigu.dev:12201
+        gelf-address: udp://logstash.local.dev:12201
         tag: dev1
 
     service_discovery:
