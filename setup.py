@@ -6,7 +6,7 @@ from ecs_compose import VERSION
 
 dependencies = [
     'botocore',
-    'boto3>=1.7.4',
+    'boto3>=1.7.9',
     'jsonmerge>=1.5.0',
     'pyyaml>=3.12'
 ]
@@ -37,7 +37,7 @@ setup(
     license='MIT',
     author='Fernando Sure',
     author_email='fernandosure@gmail.com',
-    description='Amazon ECS tools for docker-compose like deployments',
+    description='Amazon ECS cli for docker-compose like deployments',
     long_description=long_description,
     packages=find_packages(exclude=['tests']),
     include_package_data=True,

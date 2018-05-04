@@ -1,4 +1,4 @@
-boto3==1.7.4
+boto3==1.7.9
 botocore==1.10.4
 docutils==0.14
 functools32==3.2.3.post2

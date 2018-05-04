@@ -1,6 +1,5 @@
 #!/usr/bin/python
-
-from ecs import create_ecs_cluster, launch_or_update_stack, destroy_ecs_cluster, destroy_ecs_service, restart_cluster, describe_ecs_cluster
+from ecs import launch_or_update_stack, destroy_ecs_cluster, destroy_ecs_service, restart_cluster, describe_ecs_cluster
 from stack_definition import StackDefinition
 
 import yaml
@@ -21,18 +20,12 @@ def main():
 
     # create the top-level parser
 
-    parser = argparse.ArgumentParser(description='ECS Tool CLI')
-    subparsers = parser.add_subparsers(title="ECS CLI Commands", dest="cmd")
+    parser = argparse.ArgumentParser(description='ECS Compose CLI')
+    subparsers = parser.add_subparsers(title="ECS Compose CLI Commands", dest="cmd")
 
     # create the parser for the "cluster" command
     cluster_parser = subparsers.add_parser('cluster', help="cluster related operations")
     cluster_subparsers = cluster_parser.add_subparsers(title="ECS cluster commands", dest="subcmd")
-
-    create_cluster_parser = cluster_subparsers.add_parser('create', help='Creates a new empty aws ecs stack')
-    create_cluster_parser.add_argument('--name', '-n', required=True, help='name of the cluster', dest="cluster_name")
-    create_cluster_parser.add_argument('--file', '-f', required=True, nargs='+', type=argparse.FileType('r'),
-                                       help='the name of the stackfile')
-    create_cluster_parser.set_defaults(func=create_ecs_cluster)
 
     deploy_cluster_parser = cluster_subparsers.add_parser('deploy', help='Deploys the services defined in the stackfile')
     deploy_cluster_parser.add_argument('--name', '-n', required=True, help='name of the cluster', dest="cluster_name")
@@ -63,7 +56,7 @@ def main():
 
     args = parser.parse_args()
     if args.cmd == "cluster":
-        if args.subcmd == "create" or args.subcmd == "deploy":
+        if args.subcmd == "deploy":
             json_stack = {}
             for yml_file in args.file:
                 json_stack = merger.merge(json_stack, yaml.load(yml_file.read()))
