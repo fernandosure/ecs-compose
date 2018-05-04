@@ -100,7 +100,7 @@ Installation
 
 The project is available on PyPI. Simply run::
 
-    $ pip install ecs-compose
+    $ easy_install ecs-compose
 
 
 Configuration
