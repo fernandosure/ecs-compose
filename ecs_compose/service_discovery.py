@@ -57,7 +57,10 @@ class ServiceDiscovery(object):
     def list_services(self):
 
         rs = self._client.list_services()
-        lst = [Service.from_json(service) for service in rs['Services']]
+        # lst = [Service.from_json(service) for service in rs['Services']]
+        lst = []
+        for service in rs['Services']:
+            lst.append(Service.from_json(service))
 
         while rs.get('NextToken') is not None:
             rs = self._client.list_services(nextToken=rs.get('NextToken'))
@@ -109,25 +112,27 @@ class Service(object):
 
     @classmethod
     def from_json(cls, value):
-        cls.id = value.get('Id')
-        cls.arn = value.get('Arn')
-        cls.name = value.get('Name')
-        cls.description = value.get('Description')
-        cls.instance_count = value.get('ServiceCount')
-        cls.dns_config = DNSConfig.from_json(value.get('DnsConfig')) if value.get('DnsConfig') else None
-        cls.healthcheck_config = HealthCheckConfig.from_json(value.get('HealthCheckConfig')) if value.get('HealthCheckConfig') else None
-        cls.healthcheck_custom_config = HealthCheckCustomConfig.from_json(value.get('HealthCheckCustomConfig')) if value.get('HealthCheckCustomConfig') else None
-        return cls
+        obj = cls()
+        obj.id = value.get('Id')
+        obj.arn = value.get('Arn')
+        obj.name = value.get('Name')
+        obj.description = value.get('Description')
+        obj.instance_count = value.get('ServiceCount')
+        obj.dns_config = DNSConfig.from_json(value.get('DnsConfig')) if value.get('DnsConfig') else None
+        obj.healthcheck_config = HealthCheckConfig.from_json(value.get('HealthCheckConfig')) if value.get('HealthCheckConfig') else None
+        obj.healthcheck_custom_config = HealthCheckCustomConfig.from_json(value.get('HealthCheckCustomConfig')) if value.get('HealthCheckCustomConfig') else None
+        return obj
 
 
 class DNSConfig(object):
 
     @classmethod
     def from_json(cls, value):
-        cls.namespace_id = value.get('NamespaceId')
-        cls.routing_policy = value.get('RoutingPolicy')
-        cls.dns_records = [DNSRecord.from_json(x) for x in value.get('DnsRecords')]
-        return cls
+        obj = cls()
+        obj.namespace_id = value.get('NamespaceId')
+        obj.routing_policy = value.get('RoutingPolicy')
+        obj.dns_records = [DNSRecord.from_json(x) for x in value.get('DnsRecords')]
+        return obj
 
     def to_json(self):
         return {
@@ -141,9 +146,10 @@ class DNSRecord(object):
 
     @classmethod
     def from_json(cls, value):
-        cls.type = value.get('Type')
-        cls.ttl = value.get('TTL')
-        return cls
+        obj = cls()
+        obj.type = value.get('Type')
+        obj.ttl = value.get('TTL')
+        return obj
 
     def to_json(self):
         return {
@@ -156,10 +162,11 @@ class HealthCheckConfig(object):
 
     @classmethod
     def from_json(cls, value):
-        cls.type = value.get('Type')
-        cls.resource_path = value.get('ResourcePath')
-        cls.failure_threshold = value.get('FailureThreshold')
-        return cls
+        obj = cls()
+        obj.type = value.get('Type')
+        obj.resource_path = value.get('ResourcePath')
+        obj.failure_threshold = value.get('FailureThreshold')
+        return obj
 
     def to_json(self):
         return {
@@ -173,8 +180,9 @@ class HealthCheckCustomConfig(object):
 
     @classmethod
     def from_json(cls, value):
-        cls.failure_threshold = value.get('FailureThreshold')
-        return cls
+        obj = cls()
+        obj.failure_threshold = value.get('FailureThreshold')
+        return obj
 
     def to_json(self):
         return {
@@ -186,34 +194,37 @@ class Namespace(object):
 
     @classmethod
     def from_json(cls, value):
-        cls.id = value.get('Id')
-        cls.arn = value.get('Arn')
-        cls.name = value.get('Name')
-        cls.type = value.get('Type')
-        cls.description = value.get('Description')
-        cls.service_count = value.get('ServiceCount')
-        cls.dns_properties = DNSProperties.from_json(value.get('DnsProperties')) if value.get('DnsProperties') else None
-        return cls
+        obj = cls()
+        obj.id = value.get('Id')
+        obj.arn = value.get('Arn')
+        obj.name = value.get('Name')
+        obj.type = value.get('Type')
+        obj.description = value.get('Description')
+        obj.service_count = value.get('ServiceCount')
+        obj.dns_properties = DNSProperties.from_json(value.get('DnsProperties')) if value.get('DnsProperties') else None
+        return obj
 
 
 class DNSProperties(object):
 
     @classmethod
     def from_json(cls, value):
-        cls.hosted_zone_id = value['DnsProperties']['HostedZoneId']
-        return cls
+        obj = cls()
+        obj.hosted_zone_id = value['DnsProperties']['HostedZoneId']
+        return obj
 
 
 class OperationStatus(object):
 
     @classmethod
     def from_json(cls, value, target_key):
-        cls.id = value.get('Id')
-        cls.type = value.get('Type')
-        cls.status = value.get('Status')
-        cls.error_message = value.get('ErrorMessage')
-        cls.error_code = value.get('ErrorCode')
-        cls.create_date = value.get('CreateDate')
-        cls.update_date = value.get('UpdateDate')
-        cls.resource_id = value.get('Targets', {}).get(target_key)
-        return cls
+        obj = cls()
+        obj.id = value.get('Id')
+        obj.type = value.get('Type')
+        obj.status = value.get('Status')
+        obj.error_message = value.get('ErrorMessage')
+        obj.error_code = value.get('ErrorCode')
+        obj.create_date = value.get('CreateDate')
+        obj.update_date = value.get('UpdateDate')
+        obj.resource_id = value.get('Targets', {}).get(target_key)
+        return obj
