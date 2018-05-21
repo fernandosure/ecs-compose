@@ -1,23 +1,13 @@
 #!/usr/bin/python
 from ecs import launch_or_update_stack, destroy_ecs_cluster, destroy_ecs_service, restart_cluster, describe_ecs_cluster
 from stack_definition import StackDefinition
+from utils import merger
 
 import yaml
-from jsonmerge import Merger
 import argparse
 
 
 def main():
-
-    schema = {
-        "properties": {
-            "services": {
-                "mergeStrategy": "append"
-            }
-        }
-    }
-    merger = Merger(schema)
-
     # create the top-level parser
 
     parser = argparse.ArgumentParser(description='ECS Compose CLI')

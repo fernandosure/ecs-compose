@@ -1,4 +1,5 @@
 import re
+from utils import merger
 
 
 class StackDefinitionException(Exception):
@@ -23,9 +24,7 @@ class StackDefinition(object):
         if json_stack.get("services") is None:
             raise StackDefinitionException("Stack Definition: services section is required")
         else:
-            self.services = [ServiceDefinition(x, self.defaults) for x in json_stack.get("services", [])]
-
-        self.log_configuration = LogConfiguration(json_stack.get("logging", {}))
+            self.services = [ServiceDefinition(x, json_stack) for x in json_stack.get("services", [])]
 
         self.service_discovery = ServiceDiscoveryDefaults(json_stack.get("service_discovery")) if json_stack.get("service_discovery") else None
 
@@ -86,7 +85,8 @@ class DefaultsDefinition(object):
 
 
 class ServiceDefinition(object):
-    def __init__(self, json_spec, defaults):
+    def __init__(self, json_spec, json_stack):
+        defaults = DefaultsDefinition(json_stack.get("defaults"))
         self.name = json_spec.keys()[0]
         self.json = json_spec[self.name]
         self.image = self.json.get("image")
@@ -113,6 +113,9 @@ class ServiceDefinition(object):
                     "type": "distinctInstance"
                 }
             } if self.json.get("placement_strategy") == "every_node" else None
+
+        merge_rs = merger.merge(json_stack.get("logging", {}), self.json.get("logging", {}))
+        self.log_configuration = LogConfiguration(merge_rs)
 
 
 class DNSServiceDiscovery(object):

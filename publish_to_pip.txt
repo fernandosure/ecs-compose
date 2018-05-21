@@ -1,0 +1,22 @@
+
+
+1. Change the version number in ecs_compose/__init__.py
+2. we need to generate the dist build package
+
+    python setup.py sdist
+
+3. upload it to pip
+
+Note If you want to avoid entering your username and password when uploading, you can create a $HOME/.pypirc file with your username and password:
+[pypi]
+username = <username>
+password = <password>
+Be aware that this stores your password in plaintext.
+
+chmod 600 ~/.pypirc
+
+Install it via pip install twine
+Make sure your .pypirc file has the correct credentials for test.pypi.org because that is a separate database from production pypi.
+Build your sdist python setup.py sdist.
+Use twine upload --repository pypitest dist/* for your test upload.
+Use twine upload --repository pypi dist/* for your production upload.
