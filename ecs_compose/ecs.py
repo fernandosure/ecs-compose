@@ -42,7 +42,7 @@ def launch_or_update_stack(stack_name, stack):
                     "essential": True,
                     "memory": service.memory,
                     "privileged": service.privileged,
-                    "logConfiguration": stack.log_configuration.to_aws_json(),
+                    "logConfiguration": service.log_configuration.to_aws_json(),
                     "environment": environments,
                     "portMappings": service.ports,
                     "mountPoints": [{
