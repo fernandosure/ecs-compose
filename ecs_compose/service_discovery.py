@@ -20,8 +20,8 @@ class ServiceDiscovery(object):
         rs = self._client.list_namespaces()
         namespaces = [Namespace.from_json(namespace) for namespace in rs['Namespaces']]
 
-        while rs.get('NextToken') is not None:
-            rs = self._client.list_namespaces(nextToken=rs.get('NextToken'))
+        while rs.get('nextToken') is not None:
+            rs = self._client.list_namespaces(nextToken=rs.get('nextToken'))
             namespaces.extend([Namespace.from_json(namespace) for namespace in rs['Namespaces']])
         return namespaces
 
@@ -62,8 +62,8 @@ class ServiceDiscovery(object):
         for service in rs['Services']:
             lst.append(Service.from_json(service))
 
-        while rs.get('NextToken') is not None:
-            rs = self._client.list_services(nextToken=rs.get('NextToken'))
+        while rs.get('nextToken') is not None:
+            rs = self._client.list_services(nextToken=rs.get('nextToken'))
             lst.extend([Service.from_json(service) for service in rs['Services']])
         return lst
 

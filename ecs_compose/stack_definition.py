@@ -1,5 +1,7 @@
 import re
+import os
 from utils import merger
+from ecs import EcsTaskDefinition
 
 
 class StackDefinitionException(Exception):
@@ -86,14 +88,15 @@ class DefaultsDefinition(object):
 
 class ServiceDefinition(object):
     def __init__(self, json_spec, json_stack):
-        defaults = DefaultsDefinition(json_stack.get("defaults"))
+        self.defaults = DefaultsDefinition(json_stack.get("defaults"))
         self.name = json_spec.keys()[0]
         self.json = json_spec[self.name]
-        self.image = self.json.get("image")
+
         self.type = self.json.get("type", "service")
-        self.memory = self.json.get("memory", defaults.memory)
-        self.environment = [{"name": y.keys()[0], "value": str(y[y.keys()[0]])} for y in self.json.get("environment", [])]
+        self.memory = self.json.get("memory", self.defaults.memory)
         self.desired_count = self.json.get("desired_count", 1)
+        self.image = self.json.get("image")
+        self.environment = [{"name": y.keys()[0], "value": str(y[y.keys()[0]])} for y in self.json.get("environment", [])]
         self.privileged = self.json.get("privileged", False)
         self.elb = ElbDefinition(self.json.get("elb")) if self.json.get('elb') else None
         self.dns_discovery = DNSServiceDiscovery(self.json.get("dns_discovery")) if self.json.get("dns_discovery") else None
@@ -116,6 +119,48 @@ class ServiceDefinition(object):
 
         merge_rs = merger.merge(json_stack.get("logging", {}), self.json.get("logging", {}))
         self.log_configuration = LogConfiguration(merge_rs)
+
+    def get_task_definition(self, cluster):
+        family = "%s-%s" % (cluster, self.name)
+
+        # ENVIRONMENTS
+        environments = self.environment
+        environments.extend([g for g in self.defaults.environment if
+                             len([v for v in self.environment if v["name"] == g["name"]]) == 0])
+
+
+        pattern = re.compile(r"\$\{(.*)\}")
+        for env in environments:
+            match = re.search(pattern, env['value'])
+            if match:
+                env['value'] = os.getenv(match.group(1))
+
+        td = {
+            "family": family,
+            "networkMode": "host" if self.dns_discovery is None else "awsvpc",
+            "containerDefinitions": [
+                {
+                    "name": self.name,
+                    "image": self.image,
+                    "essential": True,
+                    "memory": self.memory,
+                    "privileged": self.privileged,
+                    "logConfiguration": self.log_configuration.to_aws_json(),
+                    "environment": environments,
+                    "portMappings": self.ports,
+                    "mountPoints": [{
+                        "sourceVolume": x["name"],
+                        "containerPath": x["container"],
+                        "readOnly": False
+                    } for x in self.volumes]
+                }
+            ],
+            "volumes": [{
+                "name": x["name"],
+                "host": {"sourcePath": x["host"]}
+            } for x in self.volumes]
+        }
+        return EcsTaskDefinition(td)
 
 
 class DNSServiceDiscovery(object):
