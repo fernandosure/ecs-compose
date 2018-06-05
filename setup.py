@@ -48,7 +48,7 @@ setup(
     install_requires=dependencies,
     entry_points={
         'console_scripts': [
-            'ecs-compose = ecs_compose.cli:main',
+            'ecs-compose = ecs_compose.cli:cli',
         ],
     },
     keywords=['ECS', 'AWS'],
