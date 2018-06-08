@@ -27,7 +27,7 @@ def service():
 @cluster.command()
 @click.argument("cluster")
 @click.option("-f", "--stackfile", required=True, type=click.File("rb"), multiple=True, help="the name of the stackfile")
-@click.option("--redeploy", is_flag=True, default=False)
+@click.option("--redeploy", is_flag=True, default=False, help="If you want to force a new deploy using its current settings")
 def deploy(cluster, stackfile, redeploy):
     client = EcsClient()
     ecs_cluster = client.get_single_cluster(cluster)
@@ -101,7 +101,7 @@ def describe(cluster):
                 "image": td.containers[0].image}
         }
         if service.running_count != 1:
-            svc[service.name][u'desired_count'] = service.running_count
+            svc[service.name]['desired_count'] = service.running_count
 
         result["services"].append(svc)
     print yaml.safe_dump(result, encoding="utf-8", default_flow_style=False)

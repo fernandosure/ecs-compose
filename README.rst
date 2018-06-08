@@ -16,7 +16,7 @@ TL;DR
 -----
 Deploy a complete ECS cluster with a single command::
 
-    $ ecs-compose cluster deploy -n my-cluster -f my-services.yml
+    $ ecs-compose cluster deploy my-cluster -f my-services.yml
 
 
 You just need to specify the services that will be deployed within the cluster in a YAML file like the following
@@ -136,13 +136,9 @@ destroy
 =====
 Destroy the entire AWS ECS Cluster with all services and attached load balancers associated with it.
 
-restart
-=====
-Restart all services within the specified cluster
-
 describe
 =====
-List all deployed services within the specified cluster
+List all deployed services within the specified cluster as YAML file
 
 **Individual service related operations**
 
