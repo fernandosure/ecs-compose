@@ -96,7 +96,12 @@ class ServiceDefinition(object):
         self.memory = self.json.get("memory", self.defaults.memory)
         self.desired_count = self.json.get("desired_count", 1)
         self.image = self.json.get("image")
-        self.environment = [{"name": y.keys()[0], "value": str(y[y.keys()[0]])} for y in self.json.get("environment", [])]
+
+        # ENVIRONMENTS
+        environment = [{"name": y.keys()[0], "value": str(y[y.keys()[0]])} for y in self.json.get("environment", [])]
+        environment.extend([g for g in self.defaults.environment if len([v for v in environment if v["name"] == g["name"]]) == 0])
+
+        self.environment = environment
         self.privileged = self.json.get("privileged", False)
         self.elb = ElbDefinition(self.json.get("elb")) if self.json.get('elb') else None
         self.dns_discovery = DNSServiceDiscovery(self.json.get("dns_discovery")) if self.json.get("dns_discovery") else None

@@ -84,18 +84,30 @@ class EcsService(dict):
         return self.get(u'clusterArn')
 
     @property
+    def desired_count(self):
+        return self.get(u'desiredCount')
+
+    @desired_count.setter
+    def desired_count(self, value):
+        self[u'desiredCount'] = value
+
+    @property
     def running_count(self):
         return self.get(u'runningCount')
 
     @property
-    def task_definition(self):
-        return EcsTaskDefinition.from_arn(self.get(u'taskDefinition'))
+    def task_definition_arn(self):
+        return self.get(u'taskDefinition')
 
-    def update_task_definition(self, new_task_definition):
+    @task_definition_arn.setter
+    def task_definition_arn(self, value):
+        self[u'taskDefinition'] = value
 
+    def update_service(self):
         rs = self._client.update_service(cluster=self.cluster_arn,
                                          service=self.name,
-                                         taskDefinition=new_task_definition.arn)
+                                         desiredCount=self.desired_count,
+                                         taskDefinition=self.task_definition_arn)
 
         return EcsService(rs[u'service'])
 
@@ -154,7 +166,7 @@ class EcsContainerDefinition(dict):
         return self.get(u'name')
 
     @name.setter
-    def name_setter(self, value):
+    def name(self, value):
         self[u'name'] = value
 
     @property
@@ -162,7 +174,7 @@ class EcsContainerDefinition(dict):
         return self.get(u'image')
 
     @image.setter
-    def image_setter(self, value):
+    def image(self, value):
         self[u'image'] = value
 
     @property
@@ -170,7 +182,7 @@ class EcsContainerDefinition(dict):
         return self.get(u'memory')
 
     @memory.setter
-    def memory_setter(self, value):
+    def memory(self, value):
         self[u'memory'] = value
 
     @property
@@ -182,7 +194,7 @@ class EcsContainerDefinition(dict):
         return self.get(u'entryPoint')
 
     @entrypoint.setter
-    def entrypoint_setter(self, value):
+    def entrypoint(self, value):
         self[u'entryPoint'] = value
 
     @property
@@ -190,7 +202,7 @@ class EcsContainerDefinition(dict):
         return self.get(u'command')
 
     @command.setter
-    def command_setter(self, value):
+    def command(self, value):
         self[u'command'] = value
 
     @property
@@ -198,7 +210,7 @@ class EcsContainerDefinition(dict):
         return self.get(u'environment')
 
     @environment.setter
-    def environment_setter(self, value):
+    def environment(self, value):
         self[u'environment'] = value
 
     # def apply_environments(self):

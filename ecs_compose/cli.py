@@ -1,7 +1,7 @@
 #!/usr/bin/python
 from ecs_compose import VERSION
 from utils import merger, get_ecs_service_diff
-from ecs import EcsClient
+from ecs import EcsClient, EcsTaskDefinition
 from stack_definition import StackDefinition
 from deploy import deploy_new_ecs_service, destroy_ecs_service
 import yaml
@@ -46,13 +46,16 @@ def deploy(cluster, stackfile, redeploy):
     for svc in stack_definition.services:
         service = next((x for x in services if x.name.lower() == svc.name.lower()), None)
         if service:
-            old_td = service.task_definition.copy()
-            new_td = svc.get_task_definition(cluster)
-            diff = get_ecs_service_diff(old_td, new_td)
+            diff = get_ecs_service_diff(service, svc)
             if len(diff) > 0 or redeploy:
-                new_td = new_td.register_as_new_task_definition()
-                click.secho("deploying taskDefinition version:{} of {}".format(new_td.revision, service.name))
-                service.update_task_definition(new_td)
+                if diff.get(u'image', None) or diff.get(u'environment', None):
+                    new_td = svc.get_task_definition(cluster)
+                    new_td = new_td.register_as_new_task_definition()
+                    service.task_definition_arn = new_td.arn
+                    click.secho("deploying taskDefinition version:{} of {}".format(new_td.revision, service.name))
+
+                service.desired_count = svc.desired_count
+                service.update_service()
             else:
                 click.secho("skipping deployment for {} there are no new changes in the taskDefinition".format(service.name))
         else:
@@ -90,9 +93,12 @@ def describe(cluster):
     services = ecs_cluster.get_all_services()
     result = {"services": []}
     for service in services:
+
+        td = EcsTaskDefinition.from_arn(service.task_definition_arn)
+
         svc = {
             service.name: {
-                "image": service.task_definition.containers[0].image}
+                "image": td.containers[0].image}
         }
         if service.running_count != 1:
             svc[service.name][u'desired_count'] = service.running_count
