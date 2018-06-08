@@ -8,12 +8,12 @@ from ecs_compose import VERSION
 from setuptools.command.install import install
 
 dependencies = [
-    'botocore',
+    'botocore>=1.10.9',
     'boto3>=1.7.9',
     'jsonmerge>=1.5.0',
     'pyyaml>=3.12',
     'Click>=6.7',
-    'dictdiffer>=0.7.1'
+    'jsondiff>=1.1.2'
 ]
 
 classifiers = [
