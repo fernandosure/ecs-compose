@@ -49,7 +49,7 @@ jobs:
       - run:
           name: upload to pypi
           command: |
-            . venv/bin/activate
+            source env/bin/activate
             twine upload dist/*
 
 workflows:
