@@ -22,3 +22,4 @@ Build your sdist
 python setup.py sdist
 twine upload --repository pypitest dist/* for your test upload.
 twine upload --repository pypi dist/* for your production upload.
+.
