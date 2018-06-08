@@ -2,24 +2,17 @@ version: 2
 jobs:
   build:
     docker:
-      - image: circleci/python:3.6
+      - image: circleci/python:2.7
     steps:
       - checkout
-
-      - restore_cache:
-          key: v1-dependency-cache-{{ checksum "setup.py" }}-{{ checksum "Makefile" }}
 
       - run:
           name: install python dependencies
           command: |
-            python3 -m venv venv
-            . venv/bin/activate
+            virtualenv env --no-site-packages
+            source env/bin/activate
             pip install -r requirements.txt
 
-      - save_cache:
-          key: v1-dependency-cache-{{ checksum "setup.py" }}-{{ checksum "Makefile" }}
-          paths:
-            - "venv"
 
   deploy:
     docker:
@@ -27,26 +20,18 @@ jobs:
     steps:
       - checkout
 
-      - restore_cache:
-          key: v1-dependency-cache-{{ checksum "setup.py" }}-{{ checksum "Makefile" }}
-
       - run:
           name: install python dependencies
           command: |
-            python3 -m venv venv
-            . venv/bin/activate
-            make dev
-
-      - save_cache:
-          key: v1-dependency-cache-{{ checksum "setup.py" }}-{{ checksum "Makefile" }}
-          paths:
-            - "venv"
+            virtualenv env --no-site-packages
+            source env/bin/activate
+            pip install -r requirements.txt
 
       - run:
           name: verify git tag vs. version
           command: |
-            python3 -m venv venv
-            . venv/bin/activate
+            virtualenv env --no-site-packages
+            source env/bin/activate
             python setup.py verify
 
       - run:
