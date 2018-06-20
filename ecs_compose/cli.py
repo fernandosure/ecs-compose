@@ -1,9 +1,9 @@
 #!/usr/bin/python
 from ecs_compose import VERSION
-from utils import merger, get_ecs_service_diff
-from ecs import EcsClient, EcsTaskDefinition
-from stack_definition import StackDefinition
-from deploy import deploy_new_ecs_service, destroy_ecs_service
+from nysa_aws.utils import merger, get_ecs_service_diff
+from nysa_aws.ecs import EcsClient, EcsTaskDefinition
+from nysa_aws.stack_definition import StackDefinition
+from nysa_aws.deploy import deploy_new_ecs_service, destroy_ecs_service
 import yaml
 import click
 
@@ -26,7 +26,7 @@ def service():
 
 @cluster.command()
 @click.argument("cluster")
-@click.option("-f", "--stackfile", required=True, type=click.File("rb"), multiple=True, help="the name of the stackfile")
+@click.option("-f", "--stackfile", required=True, type=click.File("rb"), multiple=True, default="stackfile.yml", help="the name of the stackfile")
 @click.option("--redeploy", is_flag=True, default=False, help="If you want to force a new deploy using its current settings")
 def deploy(cluster, stackfile, redeploy):
     client = EcsClient()
