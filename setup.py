@@ -14,6 +14,7 @@ dependencies = [
     'pyyaml>=3.12',
     'Click>=6.7',
     'jsondiff>=1.1.2'
+    'nysa-aws'
 ]
 
 classifiers = [
@@ -63,9 +64,6 @@ setup(
     zip_safe=False,
     platforms='any',
     install_requires=dependencies,
-    dependency_links=[
-        'git://github.com/fernandosure/nysa-aws.git@master#egg=nysa_aws'
-    ],
     entry_points={
         'console_scripts': [
             'ecs-compose = ecs_compose.cli:cli',
