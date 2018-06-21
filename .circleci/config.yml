@@ -14,7 +14,7 @@ jobs:
 #            pip install -r requirements.txt
 
 
-  build_and_deploy:
+  build:
     docker:
       - image: circleci/python:2.7
     steps:
