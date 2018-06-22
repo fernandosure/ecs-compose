@@ -21,7 +21,7 @@ jobs:
             ecs-compose --version
 
 
-  build:
+  deploy:
     docker:
       - image: circleci/python:2.7
     steps:
