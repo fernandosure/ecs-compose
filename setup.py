@@ -14,7 +14,6 @@ dependencies = [
     'pyyaml>=3.12',
     'Click>=6.7',
     'jsondiff>=1.1.2'
-    'nysa-aws'
 ]
 
 classifiers = [

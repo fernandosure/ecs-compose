@@ -11,7 +11,6 @@ jmespath==0.9.3
 jsondiff==1.1.2
 jsonmerge==1.5.1
 jsonschema==2.6.0
--e git://github.com/fernandosure/nysa-aws.git@b5d59153a4bf209d571986843a9ce812c73e596a#egg=nysa_aws
 pkginfo==1.4.2
 python-dateutil==2.7.3
 PyYAML==3.12
