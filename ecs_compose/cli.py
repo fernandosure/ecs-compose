@@ -1,9 +1,9 @@
 #!/usr/bin/python
 from ecs_compose import VERSION
-from nysa_aws.utils import merger, get_ecs_service_diff
-from nysa_aws.ecs import EcsClient, EcsTaskDefinition
-from nysa_aws.stack_definition import StackDefinition
-from nysa_aws.deploy import deploy_new_ecs_service, destroy_ecs_service
+from utils import merger, get_ecs_service_diff
+from ecs import EcsClient, EcsTaskDefinition
+from stack_definition import StackDefinition
+from deploy import deploy_new_ecs_service, destroy_ecs_service
 import yaml
 import click
 
