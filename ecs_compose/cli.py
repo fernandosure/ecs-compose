@@ -108,9 +108,10 @@ def describe(cluster):
 
 
 @service.command()
-@click.argument("service")
+@click.argument("cluster")
+@click.option("-s", "--service", required=True, help="the name of the service to destroy")
 @click.confirmation_option(help='Are you sure you want to do this?')
-def destroy(service):
+def destroy(cluster, service):
     client = EcsClient()
     ecs_cluster = client.get_single_cluster(cluster)
 
@@ -118,11 +119,11 @@ def destroy(service):
         click.secho("cluster does not exists")
         return
 
-    service = ecs_cluster.get_single_service(service)
-    if service is None:
+    ecs_service = ecs_cluster.get_single_service(service)
+    if ecs_service is None:
         click.secho("Service does not exists")
 
-    destroy_ecs_service(cluster, service.arn)
+    destroy_ecs_service(cluster, ecs_service.arn)
 
 
 if __name__ == "__main__":
