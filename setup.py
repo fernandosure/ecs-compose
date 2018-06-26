@@ -30,7 +30,7 @@ classifiers = [
         'Topic :: Software Development :: Libraries :: Python Modules',
     ]
 
-with open('README.rst', 'r') as f:
+with open('README.md', 'r') as f:
     long_description = f.read()
 
 
@@ -58,6 +58,7 @@ setup(
     author_email='fernandosure@gmail.com',
     description='Amazon ECS cli for docker-compose like deployments',
     long_description=long_description,
+    long_description_content_type='text/markdown',
     packages=find_packages(exclude=['tests']),
     include_package_data=True,
     zip_safe=False,
