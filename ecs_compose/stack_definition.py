@@ -47,7 +47,7 @@ class LogConfiguration(object):
             raise LogConfigurationException("Log Configuration: Log Driver Required")
 
     def to_aws_json(self):
-        str
+
         if self.log_driver is None and self.options is None:
             return {}
         else:
@@ -103,7 +103,7 @@ class ServiceDefinition(object):
 
         self.environment = environment
         self.privileged = self.json.get("privileged", False)
-        self.elb = ElbDefinition(self.json.get("elb")) if self.json.get('elb') else None
+        self.elb = ElbDefinition(self.json.get("elb")) if self.json.get("elb") else None
         self.dns_discovery = DNSServiceDiscovery(self.json.get("dns_discovery")) if self.json.get("dns_discovery") else None
 
         regex = re.compile("([0-9]{4}):([0-9]{4})")
@@ -112,18 +112,12 @@ class ServiceDefinition(object):
         regex = re.compile("(.+):(.+):(.+)")
         self.volumes = [{"name": x.group(1), "host": x.group(2), "container": x.group(3)} for y in self.json.get("volumes",[]) for x in [regex.search(y)] if x]
 
-        self.placement_strategy = {
-                "placement_strategy": {
-                    'type': 'spread',
-                    'field': 'host'
-                },
-                "placement_constraints": {
-                    "type": "distinctInstance"
-                }
-            } if self.json.get("placement_strategy") == "every_node" else None
+        self.scheduling_strategy = self.json.get("scheduling_strategy", "REPLICA")
 
         merge_rs = merger.merge(json_stack.get("logging", {}), self.json.get("logging", {}))
         self.log_configuration = LogConfiguration(merge_rs)
+
+        self.healthcheck = HealthCheckDefinition(self.json.get("healthcheck")) if self.json.get("healthcheck") else None
 
     def get_task_definition(self, cluster):
         family = "%s-%s" % (cluster, self.name)
@@ -133,12 +127,11 @@ class ServiceDefinition(object):
         environments.extend([g for g in self.defaults.environment if
                              len([v for v in self.environment if v["name"] == g["name"]]) == 0])
 
-
         pattern = re.compile(r"\$\{(.*)\}")
         for env in environments:
-            match = re.search(pattern, env['value'])
+            match = re.search(pattern, env["value"])
             if match:
-                env['value'] = os.getenv(match.group(1))
+                env["value"] = os.getenv(match.group(1))
 
         td = {
             "family": family,
@@ -153,6 +146,7 @@ class ServiceDefinition(object):
                     "logConfiguration": self.log_configuration.to_aws_json(),
                     "environment": environments,
                     "portMappings": self.ports,
+                    "healthCheck": self.healthcheck.to_aws_json() if self.healthcheck else None,
                     "mountPoints": [{
                         "sourceVolume": x["name"],
                         "containerPath": x["container"],
@@ -170,7 +164,7 @@ class ServiceDefinition(object):
 
 class DNSServiceDiscovery(object):
     def __init__(self, json_spec):
-        self.name = json_spec.get('name')
+        self.name = json_spec.get("name")
         self.healthcheck = ServiceHealthCheck(json_spec.get("healthcheck", {}))
 
 
@@ -194,7 +188,7 @@ class ServiceHealthCheck(object):
         self.timeout_seconds = json_spec.get("timeout_seconds", 5)
         self.healthy_threshold_count = json_spec.get("healthy_threshold_count", 2)
         self.unhealthy_threshold_count = json_spec.get("unhealthy_threshold_count", 10)
-        self.failure_threshold = json_spec.get('FailureThreshold', 1)
+        self.failure_threshold = json_spec.get("FailureThreshold", 1)
 
 
 class ServicePortsDefinition(object):
@@ -207,3 +201,21 @@ class ElbDnsDefinition(object):
     def __init__(self, json_spec):
         self.hosted_zone_id = json_spec.get("hosted_zone_id")
         self.record_name = json_spec.get("record_name")
+
+
+class HealthCheckDefinition(object):
+    def __init__(self, json_spec):
+        self.command = json_spec.get("command", [])
+        self.interval = json_spec.get("interval", 30)
+        self.timeout = json_spec.get("timeout", 5)
+        self.retries = json_spec.get("retries", 3)
+        self.start_period = json_spec.get("start_period", 0)
+
+    def to_aws_json(self):
+        return {
+            "command": self.command,
+            "interval": self.interval,
+            "timeout": self.timeout,
+            "retries": self.retries,
+            "startPeriod": self.start_period
+        }

@@ -1,0 +1,79 @@
+vpc:
+  id: vpc-xxx
+  subnets:
+    public: ["subnet-pub1", "subnet-pub2", "subnet-pub3"]
+    private: ["subnet-prv1", "subnet-prv2", "subnet-prv3"]
+
+  security_groups:
+    public: ["sg-public"]
+    private: ["sg-private"]
+
+logging:
+  log_driver: gelf
+  options:
+    gelf-address: udp://logstash.mydomain.dev:12201
+    tag: dev
+
+service_discovery:
+  namespace: local.sd
+
+defaults:
+  memory: 650
+  environment:
+    - JAVA_OPTS: -Duser.timezone="UTC" -Xms256m -Xmx322m -XX:MetaspaceSize=64m -XX:MaxMetaspaceSize=135m -XX:CompressedClassSpaceSize=16m -XX:ReservedCodeCacheSize=50m
+    - SPRING_PROFILES_ACTIVE: dev,ecs,standalone
+    - LOGGING_LEVEL_ROOT: INFO
+    - PORT: 0
+
+services:
+  - service_A:
+      image: xxx/service_A:latest
+      ports:
+        - "8888:8888"
+      environment:
+        - PORT: 8888
+      desired_count: 1
+      dns_discovery:
+        name: service_A.dev
+      healthcheck:
+        command: curl http://localhost:8080/health
+        start_period: 60
+
+  - service_B:
+      image: xxx/service_B:100
+      ports:
+        - "8761:8761"
+      environment:
+        - SPRING_PROFILES_ACTIVE: ecs
+        - PORT: 8761
+      dns_discovery:
+        name: service_B.dev
+      logging:
+        log_driver: awslogs
+        options:
+          awslogs-group: /ecs/dev
+          awslogs-region: us-east-1
+          awslogs-stream-prefix: service_B
+
+  - nginx:
+      image: nginx:latest
+      ports:
+        - "8080:8080"
+      environment:
+        - PORT: 8080
+      desired_count: 1
+      elb:
+        type: public
+        protocol: HTTPS
+        ports:
+          public: 443
+          container: 8080
+        certificates:
+          - arn:aws:acm:us-east-1:xxx:certificate/xxx-xxx-xxx-xxx-xxx
+        dns:
+          hosted_zone_id: xxxx
+          record_name: dev.domain.com
+        healthcheck:
+          protocol: HTTP
+          port: 8081
+          path: /health

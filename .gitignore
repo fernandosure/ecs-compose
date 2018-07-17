@@ -45,4 +45,6 @@ env/
 
 .idea
 
+.pytest_cache/
+
 yml_files/

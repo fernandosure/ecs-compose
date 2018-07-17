@@ -148,9 +148,7 @@ def deploy_new_ecs_service(cluster, stack_definition, service):
                                                 "minimumHealthyPercent": 50
                                             },
                 "loadBalancers": load_balancers,
-                "placementStrategy": [service.placement_strategy.get("placement_strategy")] if service.placement_strategy is not None else [],
-                "placementConstraints": [service.placement_strategy.get("placement_constraints")] if service.placement_strategy is not None else []
-
+                "schedulingStrategy": service.scheduling_strategy
             }
 
             if service.dns_discovery:
@@ -176,7 +174,7 @@ def deploy_new_ecs_service(cluster, stack_definition, service):
                     }
                 }
 
-            # # Creating the service
+            # Creating the service
             print "creating service: %s " % service.name
             create_service_response = ecs.create_service(**svc_def)
             print("service_definition: %s response: %s" % (service.name, create_service_response.get("ResponseMetadata", {}).get("HTTPStatusCode")))

@@ -14,6 +14,13 @@ jobs:
             pip install -r requirements.txt
 
       - run:
+          name: run tests
+          command: |
+            virtualenv env --no-site-packages
+            source env/bin/activate
+            pytest -v
+
+      - run:
           name: test local installation
           command: |
             source env/bin/activate
