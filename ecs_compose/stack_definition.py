@@ -146,7 +146,6 @@ class ServiceDefinition(object):
                     "logConfiguration": self.log_configuration.to_aws_json(),
                     "environment": environments,
                     "portMappings": self.ports,
-                    "healthCheck": self.healthcheck.to_aws_json() if self.healthcheck else None,
                     "mountPoints": [{
                         "sourceVolume": x["name"],
                         "containerPath": x["container"],
@@ -159,6 +158,10 @@ class ServiceDefinition(object):
                 "host": {"sourcePath": x["host"]}
             } for x in self.volumes]
         }
+
+        if self.healthcheck:
+            td["containerDefinitions"][0]["healthCheck"] = self.healthcheck.to_aws_json()
+
         return EcsTaskDefinition(td)
 
 

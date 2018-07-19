@@ -26,3 +26,13 @@ class StackDefinitionTestCase(unittest.TestCase):
         svc = next((x for x in self.sd.services if x.name == "service_A"), None)
         self.assertEqual(svc.healthcheck.to_aws_json().get('command'), "curl http://localhost:8080/health")
         self.assertEqual(svc.healthcheck.to_aws_json().get('startPeriod'), 60)
+
+    def test_task_definition_healthcheck_should_exist_in_service_A(self):
+        svc = next((x for x in self.sd.services if x.name == "service_A"), None)
+        td = svc.get_task_definition("test")
+        self.assertTrue(td.containers[0].get("healthCheck") is not None)
+
+    def test_task_definition_healthcheck_should_not_exists_in_service_B(self):
+        svc = next((x for x in self.sd.services if x.name == "service_B"), None)
+        td = svc.get_task_definition("test")
+        self.assertTrue(td.containers[0].get("healthCheck") is None)
