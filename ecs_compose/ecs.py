@@ -213,6 +213,14 @@ class EcsContainerDefinition(dict):
     def environment(self, value):
         self[u'environment'] = value
 
+    @property
+    def healthcheck(self):
+        return self.get(u'healthCheck')
+
+    @healthcheck.setter
+    def healthcheck(self, value):
+        self[u'healthCheck'] = value
+
     # def apply_environments(self):
     #     pattern = re.compile(r"\$\{(.*)\}")
     #     for env in self[u'environment']:

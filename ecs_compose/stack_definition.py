@@ -84,6 +84,7 @@ class DefaultsDefinition(object):
     def __init__(self, json_spec):
         self.memory = json_spec.get("memory", 1024)
         self.environment = [{"name": y.keys()[0], "value": str(y[y.keys()[0]])} for y in json_spec.get("environment", [])]
+        self.healthcheck = HealthCheckDefinition(json_spec.get("healthcheck")) if json_spec.get("healthcheck") else None
 
 
 class ServiceDefinition(object):
@@ -117,7 +118,13 @@ class ServiceDefinition(object):
         merge_rs = merger.merge(json_stack.get("logging", {}), self.json.get("logging", {}))
         self.log_configuration = LogConfiguration(merge_rs)
 
-        self.healthcheck = HealthCheckDefinition(self.json.get("healthcheck")) if self.json.get("healthcheck") else None
+        self.healthcheck = None
+
+        if self.defaults.healthcheck:
+            self.healthcheck = self.defaults.healthcheck
+
+        if self.json.get("healthcheck"):
+            self.healthcheck = HealthCheckDefinition(self.json.get("healthcheck"))
 
     def get_task_definition(self, cluster):
         family = "%s-%s" % (cluster, self.name)

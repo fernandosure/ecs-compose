@@ -46,7 +46,8 @@ def deploy(cluster, stackfile, redeploy):
     for svc in stack_definition.services:
         service = next((x for x in services if x.name.lower() == svc.name.lower()), None)
         if service:
-            diff = get_ecs_service_diff(service, svc)
+            old_td = EcsTaskDefinition.from_arn(service.task_definition_arn)
+            diff = get_ecs_service_diff(service, old_td, svc)
             if len(diff) > 0 or redeploy:
                 if diff.get(u'image', None) or diff.get(u'environment', None):
                     new_td = svc.get_task_definition(cluster)

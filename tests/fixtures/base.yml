@@ -36,7 +36,9 @@ services:
       dns_discovery:
         name: service_A.dev
       healthcheck:
-        command: curl http://localhost:8080/health
+        command:
+         - CMD-SHELL
+         - sh healthcheck.sh
         start_period: 60
 
   - service_B:
