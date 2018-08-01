@@ -37,8 +37,8 @@ def get_ecs_service_diff(old_service, old_td, new_service):
     if diff(old_td_env, new_td_env):
         rs[u"environment"] = {u"old": old_td_env, u"new": new_td_env}
 
-    old_healthcheck = old_td.containers[0].healthcheck
-    new_healthcheck = new_service.healthcheck.to_aws_json()
+    old_healthcheck =  old_td.containers[0].healthcheck if old_td.containers[0].healthcheck else {}
+    new_healthcheck = new_service.healthcheck.to_aws_json() if new_service.healthcheck else {}
 
     if diff(old_healthcheck, new_healthcheck):
         rs[u"healthcheck"] = {u"old": old_healthcheck, u"new": new_healthcheck}
