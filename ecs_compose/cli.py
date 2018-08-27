@@ -49,11 +49,10 @@ def deploy(cluster, stackfile, redeploy):
             old_td = EcsTaskDefinition.from_arn(service.task_definition_arn)
             diff = get_ecs_service_diff(service, old_td, svc)
             if len(diff) > 0 or redeploy:
-                if diff.get(u'image', None) or diff.get(u'environment', None):
-                    new_td = svc.get_task_definition(cluster)
-                    new_td = new_td.register_as_new_task_definition()
-                    service.task_definition_arn = new_td.arn
-                    click.secho("deploying taskDefinition version:{} of {}".format(new_td.revision, service.name))
+                new_td = svc.get_task_definition(cluster)
+                new_td = new_td.register_as_new_task_definition()
+                service.task_definition_arn = new_td.arn
+                click.secho("deploying taskDefinition version:{} of {}".format(new_td.revision, service.name))
 
                 service.desired_count = svc.desired_count
                 service.update_service()
