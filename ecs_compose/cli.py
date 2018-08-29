@@ -55,7 +55,7 @@ def deploy(cluster, stackfile, redeploy):
                 click.secho("deploying taskDefinition version:{} of {}".format(new_td.revision, service.name))
 
                 service.desired_count = svc.desired_count
-                service.update_service()
+                service.update_service(force_new_deployment=redeploy)
             else:
                 click.secho("skipping deployment for {} there are no new changes in the taskDefinition".format(service.name))
         else:

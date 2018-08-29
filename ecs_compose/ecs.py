@@ -103,11 +103,12 @@ class EcsService(dict):
     def task_definition_arn(self, value):
         self[u'taskDefinition'] = value
 
-    def update_service(self):
+    def update_service(self, force_new_deployment=False):
         rs = self._client.update_service(cluster=self.cluster_arn,
                                          service=self.name,
                                          desiredCount=self.desired_count,
-                                         taskDefinition=self.task_definition_arn)
+                                         taskDefinition=self.task_definition_arn,
+                                         forceNewDeployment=force_new_deployment)
 
         return EcsService(rs[u'service'])
 
