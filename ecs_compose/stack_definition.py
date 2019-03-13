@@ -171,10 +171,10 @@ class ServiceDefinition(object):
             td["containerDefinitions"][0]["healthCheck"] = self.healthcheck.to_aws_json()
 
         if self.gpus > 0:
-            td["containerDefinitions"][0]["resourceRequirements"] = {
+            td["containerDefinitions"][0]["resourceRequirements"] = [{
                                                                         "type": "GPU",
-                                                                        "value": "\"{}\"".format(self.gpus)
-                                                                    }
+                                                                        "value": "{}".format(self.gpus)
+                                                                    }]
         return EcsTaskDefinition(td)
 
 
