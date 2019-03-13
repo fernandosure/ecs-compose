@@ -90,6 +90,15 @@ services:
       dns_discovery:
         name: user.staging
 
+  - deeplearning:
+      image: xxx.dkr.ecr.us-east-1.amazonaws.com/deep-learning:latest
+      ports:
+        - "8080:8080"
+      desired_count: 1
+      gpus: 1
+      dns_discovery:
+        name: deeplearning.staging
+        
  # WORKERS NO PORTS EXPOSED
   - email-worker:
       image: xxx.dkr.ecr.us-east-1.amazonaws.com/email-worker:xxx
@@ -189,6 +198,7 @@ Each array item corresponds to a different service and you will need to specify 
 - ports: if the service will expose ports to the outside then you need to specify those in short syntax (HOST:CONTAINER).
 - environment: the environment variable declared in this section have greater precedence over the global definition and will overwrite the global one.
 - desired_count: the number of desired instances for the service
+- gpus: the number of gpu's assigned (when using gpu instances)
 - elb: the application load balancer definition.
   - type: whether if the load balancer will be public (will be placed in the public subnet and a public security group assigned) or private (will be place in the private subnet and a private security group assigned)
   - protocol: The protocol for connections from clients to the load balancer (HTTP/HTTPS)
