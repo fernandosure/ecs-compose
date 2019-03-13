@@ -79,3 +79,27 @@ services:
           protocol: HTTP
           port: 8081
           path: /health
+
+  - deeplearning:
+      image: deeplearning:latest
+      ports:
+        - "8080:8080"
+      environment:
+        - PORT: 8080
+      desired_count: 1
+      gpus: 1
+      elb:
+        type: public
+        protocol: HTTPS
+        ports:
+          public: 443
+          container: 8080
+        certificates:
+          - arn:aws:acm:us-east-1:xxx:certificate/xxx-xxx-xxx-xxx-xxx
+        dns:
+          hosted_zone_id: xxxx
+          record_name: dev.domain.com
+        healthcheck:
+          protocol: HTTP
+          port: 8081
+          path: /health

@@ -14,7 +14,7 @@ class StackDefinitionTestCase(unittest.TestCase):
         self.assertIsNotNone(self.sd)
 
     def test_should_have_three_services(self):
-        self.assertEqual(len(self.sd.services), 3)
+        self.assertEqual(len(self.sd.services), 4)
 
     def test_should_have_vpc_section(self):
         self.assertIsNotNone(self.sd.vpc)
@@ -36,3 +36,13 @@ class StackDefinitionTestCase(unittest.TestCase):
         svc = next((x for x in self.sd.services if x.name == "service_B"), None)
         td = svc.get_task_definition("test")
         self.assertTrue(td.containers[0].get("healthCheck") is None)
+
+    def test_task_definition_gpus_should_exists_in_deeplearning_service(self):
+        svc = next((x for x in self.sd.services if x.name == "deeplearning"), None)
+        td = svc.get_task_definition("test")
+        self.assertTrue(td.containers[0].get("resourceRequirements") is not None)
+
+    def test_task_definition_gpus_should_not_exists_in_Service_A(self):
+        svc = next((x for x in self.sd.services if x.name == "service_A"), None)
+        td = svc.get_task_definition("test")
+        self.assertTrue(td.containers[0].get("resourceRequirements") is None)

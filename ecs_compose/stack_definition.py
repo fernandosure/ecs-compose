@@ -97,6 +97,7 @@ class ServiceDefinition(object):
         self.memory = self.json.get("memory", self.defaults.memory)
         self.desired_count = self.json.get("desired_count", 1)
         self.image = self.json.get("image")
+        self.gpus = self.json.get("gpus", 0)
 
         # ENVIRONMENTS
         environment = [{"name": y.keys()[0], "value": str(y[y.keys()[0]])} for y in self.json.get("environment", [])]
@@ -169,6 +170,11 @@ class ServiceDefinition(object):
         if self.healthcheck:
             td["containerDefinitions"][0]["healthCheck"] = self.healthcheck.to_aws_json()
 
+        if self.gpus > 0:
+            td["containerDefinitions"][0]["resourceRequirements"] = {
+                                                                        "type": "GPU",
+                                                                        "value": "\"{}\"".format(self.gpus)
+                                                                    }
         return EcsTaskDefinition(td)
 
 
