@@ -127,6 +127,9 @@ class ServiceDefinition(object):
         if self.json.get("healthcheck"):
             self.healthcheck = HealthCheckDefinition(self.json.get("healthcheck"))
 
+        self.deployment_configuration = DeploymentConfiguration(self.json.get('deployment_configuration', {}))
+        self.placement_constraints = [ PlacementConstraint(item) for item in self.json.get('placement_constraints', []) ]
+
     def get_task_definition(self, cluster):
         family = "%s-%s" % (cluster, self.name)
 
@@ -164,7 +167,8 @@ class ServiceDefinition(object):
             "volumes": [{
                 "name": x["name"],
                 "host": {"sourcePath": x["host"]}
-            } for x in self.volumes]
+            } for x in self.volumes],
+            "placementConstraints": [ item.to_aws_json() for item in self.placement_constraints ]
         }
 
         if self.healthcheck:
@@ -177,6 +181,27 @@ class ServiceDefinition(object):
                                                                     }]
         return EcsTaskDefinition(td)
 
+class PlacementConstraint(object):
+    def __init__(self, json_spec):
+        self.expression = json_spec.get('expression')
+        self.type = json_spec.get('type')
+
+    def to_aws_json(self):
+        return {
+            "expression": self.expression,
+            "type": self.type
+        }
+
+class DeploymentConfiguration(object):
+    def __init__(self, json_spec):
+        self.maximum_percent = json_spec.get('maximum_percent', 200)
+        self.minimum_healthy_percent = json_spec.get('minimum_healthy_percent', 50)
+
+    def to_aws_json(self):
+        return {
+            "maximumPercent": self.maximum_percent,
+            "minimumHealthyPercent": self.minimum_healthy_percent
+        }
 
 class DNSServiceDiscovery(object):
     def __init__(self, json_spec):

@@ -81,6 +81,14 @@ services:
           protocol: HTTP
           port: 8080
           path: /health
+      deployment_configuration:
+        maximum_percent: 100
+        minimum_healthy_percent: 0
+      placement_constraints:
+        - expression: "attribute:ecs.instance-type =~ p3.*"
+          type: "memberOf"
+        - expression: "attribute:ecs.availability-zone == us-east-1a"
+          type: "memberOf"
 
   - user-service:
       image: xxx.dkr.ecr.us-east-1.amazonaws.com/user-service:latest
@@ -190,6 +198,7 @@ services:
           protocol: HTTP
           port: 8080
           path: /health
+
 ```
 In this section you define an array of services that will be deployed in the cluster.
 Each array item corresponds to a different service and you will need to specify the name of the service and then its properties.
@@ -199,6 +208,12 @@ Each array item corresponds to a different service and you will need to specify 
 - environment: the environment variable declared in this section have greater precedence over the global definition and will overwrite the global one.
 - desired_count: the number of desired instances for the service
 - gpus: the number of gpu's assigned (when using gpu instances)
+- placement_constraints: rules that are considered during task placement.
+  - expression: A cluster query language expression to apply to the constraint. You cannot specify an expression if the constraint type is distinctInstance.
+  - type: The type of constraint. Use distinctInstance to ensure that each task in a particular group is running on a different container instance. Use memberOf to restrict the selection to a group of valid candidates.
+- deployment_configuration:
+  - maximum_percent: represents an upper limit on the number of your service's tasks that are allowed in the RUNNING or PENDING state during a deployment, as a percentage of the desired number of tasks (rounded down to the nearest integer).
+  - minimum_healthy_percent: represents a lower limit on the number of your service's tasks that must remain in the RUNNING state during a deployment, as a percentage of the desired number of tasks (rounded up to the nearest integer).
 - elb: the application load balancer definition.
   - type: whether if the load balancer will be public (will be placed in the public subnet and a public security group assigned) or private (will be place in the private subnet and a private security group assigned)
   - protocol: The protocol for connections from clients to the load balancer (HTTP/HTTPS)

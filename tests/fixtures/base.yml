@@ -40,6 +40,14 @@ services:
          - CMD-SHELL
          - sh healthcheck.sh
         start_period: 60
+      deployment_configuration:
+        maximum_percent: 100
+        minimum_healthy_percent: 0
+      placement_constraints:
+        - expression: "attribute:ecs.instance-type =~ p3.*"
+          type: "memberOf"
+        - expression: "attribute:ecs.availability-zone == us-east-1a"
+          type: "memberOf"
 
   - service_B:
       image: xxx/service_B:100

@@ -122,15 +122,13 @@ def deploy_new_ecs_service(cluster, stack_definition, service):
         if len([x for x in describe_services_response.get("services") if x.get("status") != "INACTIVE"]) > 0:
             # Update the service with the last revision of the task definition
             print "updating service: %s " % service.name
+
             update_service_response = ecs.update_service(
                 cluster=cluster,
                 service=service.name,
                 taskDefinition=family,
                 desiredCount=service.desired_count,
-                deploymentConfiguration={
-                    "maximumPercent": 200,
-                    "minimumHealthyPercent": 50
-                }
+                deploymentConfiguration=service.deployment_configuration.to_aws_json()
             )
 
             print("update service_definition: %s response: %s" % (service.name, update_service_response.get("ResponseMetadata", {}).get("HTTPStatusCode")))
@@ -143,10 +141,7 @@ def deploy_new_ecs_service(cluster, stack_definition, service):
                 "taskDefinition": family,
                 "role": "ecs-service-role" if len(load_balancers) > 0 else "",
                 "desiredCount": service.desired_count,
-                "deploymentConfiguration": {
-                                                "maximumPercent": 200,
-                                                "minimumHealthyPercent": 50
-                                            },
+                "deploymentConfiguration": service.deployment_configuration.to_aws_json(),
                 "loadBalancers": load_balancers,
                 "schedulingStrategy": service.scheduling_strategy
             }

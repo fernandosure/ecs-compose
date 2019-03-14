@@ -46,3 +46,20 @@ class StackDefinitionTestCase(unittest.TestCase):
         svc = next((x for x in self.sd.services if x.name == "service_A"), None)
         td = svc.get_task_definition("test")
         self.assertTrue(td.containers[0].get("resourceRequirements") is None)
+
+    def test_task_definition_placement_constraints_should_exists_in_Service_A(self):
+        svc = next((x for x in self.sd.services if x.name == "service_A"), None)
+        td = svc.get_task_definition("test")
+        self.assertTrue(td.get("placementConstraints") is not None)
+        self.assertTrue(len(td.get("placementConstraints")) == 2)
+
+    def test_task_definition_placement_constraints_should_not_exists_in_Service_B(self):
+        svc = next((x for x in self.sd.services if x.name == "service_B"), None)
+        td = svc.get_task_definition("test")
+        self.assertTrue(td.get("placementConstraints") == [])
+
+    def test_task_definition_deployment_configuration_shouldnt_be_the_default_in_Service_A(self):
+        svc = next((x for x in self.sd.services if x.name == "service_A"), None)
+        print svc.deployment_configuration.to_aws_json()
+        self.assertTrue(svc.deployment_configuration.maximum_percent == 100)
+        self.assertTrue(svc.deployment_configuration.minimum_healthy_percent == 0)
