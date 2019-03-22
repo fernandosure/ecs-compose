@@ -213,7 +213,7 @@ class ElbDefinition(object):
         self.name = json_spec.get("name", "")
         self.type = json_spec.get("type")
         self.ports = ServicePortsDefinition(json_spec.get("ports"))
-        self.dns = ElbDnsDefinition(json_spec.get("dns"))
+        self.dns = ElbDnsDefinition(json_spec.get("dns")) if json_spec.get("dns") else None
         self.certificates = [{"CertificateArn": x} for x in json_spec.get("certificates", [])]
         self.healthcheck = ServiceHealthCheck(json_spec.get("healthcheck", {}))
         self.protocol = json_spec.get("protocol", "HTTP")
