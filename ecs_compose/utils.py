@@ -44,4 +44,3 @@ def get_ecs_service_diff(old_service, old_td, new_service):
         rs[u"healthcheck"] = {u"old": old_healthcheck, u"new": new_healthcheck}
 
     return rs
-

@@ -6,6 +6,10 @@ import os
 
 class StackDefinitionTestCase(unittest.TestCase):
     def setUp(self):
+
+        # setting environment variables
+        os.environ['DB_PWD'] = "secret"
+
         self.fixtures_dir = os.path.join(os.path.dirname(__file__), "fixtures")
         self.json_stack = yaml.load(open(self.fixtures_dir + "/base.yml"))
         self.sd = StackDefinition(self.json_stack)
@@ -60,6 +64,12 @@ class StackDefinitionTestCase(unittest.TestCase):
 
     def test_task_definition_deployment_configuration_shouldnt_be_the_default_in_Service_A(self):
         svc = next((x for x in self.sd.services if x.name == "service_A"), None)
-        print svc.deployment_configuration.to_aws_json()
         self.assertTrue(svc.deployment_configuration.maximum_percent == 100)
         self.assertTrue(svc.deployment_configuration.minimum_healthy_percent == 0)
+
+    def test_environment_variables_in_service(self):
+        svc = next((x for x in self.sd.services if x.name == "deeplearning"), None)
+        td = svc.get_task_definition("test")
+
+        env = next(env for env in td["containerDefinitions"][0]["environment"] if env["name"] == "DB_PWD")
+        self.assertEquals(env["value"], "secret")

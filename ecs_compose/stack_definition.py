@@ -1,8 +1,7 @@
 import re
-import os
 from utils import merger
 from ecs import EcsTaskDefinition
-
+from os.path import expandvars
 
 class StackDefinitionException(Exception):
     pass
@@ -138,11 +137,8 @@ class ServiceDefinition(object):
         environments.extend([g for g in self.defaults.environment if
                              len([v for v in self.environment if v["name"] == g["name"]]) == 0])
 
-        pattern = re.compile(r"\$\{(.*)\}")
         for env in environments:
-            match = re.search(pattern, env["value"])
-            if match:
-                env["value"] = os.getenv(match.group(1))
+            env["value"] = expandvars(env["value"])
 
         td = {
             "family": family,
@@ -181,6 +177,7 @@ class ServiceDefinition(object):
                                                                     }]
         return EcsTaskDefinition(td)
 
+
 class PlacementConstraint(object):
     def __init__(self, json_spec):
         self.expression = json_spec.get('expression')
@@ -192,6 +189,7 @@ class PlacementConstraint(object):
             "type": self.type
         }
 
+
 class DeploymentConfiguration(object):
     def __init__(self, json_spec):
         self.maximum_percent = json_spec.get('maximum_percent', 200)
@@ -202,6 +200,7 @@ class DeploymentConfiguration(object):
             "maximumPercent": self.maximum_percent,
             "minimumHealthyPercent": self.minimum_healthy_percent
         }
+
 
 class DNSServiceDiscovery(object):
     def __init__(self, json_spec):

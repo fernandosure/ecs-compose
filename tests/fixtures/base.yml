@@ -94,6 +94,7 @@ services:
         - "8080:8080"
       environment:
         - PORT: 8080
+        - DB_PWD: $DB_PWD
       desired_count: 1
       gpus: 1
       elb:
