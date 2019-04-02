@@ -3,6 +3,7 @@ from utils import merger
 from ecs import EcsTaskDefinition
 from os.path import expandvars
 
+
 class StackDefinitionException(Exception):
     pass
 
@@ -82,7 +83,7 @@ class SecurityGroupsDefinition(object):
 class DefaultsDefinition(object):
     def __init__(self, json_spec):
         self.memory = json_spec.get("memory", 1024)
-        self.environment = [{"name": y.keys()[0], "value": str(y[y.keys()[0]])} for y in json_spec.get("environment", [])]
+        self.environment = [{"name": y.keys()[0], "value": expandvars(str(y[y.keys()[0]]))} for y in json_spec.get("environment", [])]
         self.healthcheck = HealthCheckDefinition(json_spec.get("healthcheck")) if json_spec.get("healthcheck") else None
 
 
@@ -99,7 +100,7 @@ class ServiceDefinition(object):
         self.gpus = self.json.get("gpus", 0)
 
         # ENVIRONMENTS
-        environment = [{"name": y.keys()[0], "value": str(y[y.keys()[0]])} for y in self.json.get("environment", [])]
+        environment = [{"name": y.keys()[0], "value": expandvars(str(y[y.keys()[0]]))} for y in self.json.get("environment", [])]
         environment.extend([g for g in self.defaults.environment if len([v for v in environment if v["name"] == g["name"]]) == 0])
 
         self.environment = environment
@@ -132,14 +133,6 @@ class ServiceDefinition(object):
     def get_task_definition(self, cluster):
         family = "%s-%s" % (cluster, self.name)
 
-        # ENVIRONMENTS
-        environments = self.environment
-        environments.extend([g for g in self.defaults.environment if
-                             len([v for v in self.environment if v["name"] == g["name"]]) == 0])
-
-        for env in environments:
-            env["value"] = expandvars(env["value"])
-
         td = {
             "family": family,
             "networkMode": "host" if self.dns_discovery is None else "awsvpc",
@@ -151,7 +144,7 @@ class ServiceDefinition(object):
                     "memory": self.memory,
                     "privileged": self.privileged,
                     "logConfiguration": self.log_configuration.to_aws_json(),
-                    "environment": environments,
+                    "environment": self.environment,
                     "portMappings": self.ports,
                     "mountPoints": [{
                         "sourceVolume": x["name"],
