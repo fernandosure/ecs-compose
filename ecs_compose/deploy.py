@@ -139,7 +139,7 @@ def deploy_new_ecs_service(cluster, stack_definition, service):
                 "cluster": cluster,
                 "serviceName": service.name,
                 "taskDefinition": family,
-                "role": "ecs-service-role" if len(load_balancers) > 0 else "",
+                # "role": "ecs-service-role" if len(load_balancers) > 0 else "",
                 "desiredCount": service.desired_count,
                 "deploymentConfiguration": service.deployment_configuration.to_aws_json(),
                 "loadBalancers": load_balancers,
