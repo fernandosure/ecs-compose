@@ -68,7 +68,8 @@ def deploy_new_ecs_service(cluster, stack_definition, service):
                     HealthCheckIntervalSeconds=service.elb.healthcheck.interval_seconds,
                     HealthCheckTimeoutSeconds=service.elb.healthcheck.timeout_seconds,
                     HealthyThresholdCount=service.elb.healthcheck.healthy_threshold_count,
-                    UnhealthyThresholdCount=service.elb.healthcheck.unhealthy_threshold_count
+                    UnhealthyThresholdCount=service.elb.healthcheck.unhealthy_threshold_count,
+                    TargetType="ip" if service.dns_discovery else "instance"
                 )
                 target_group_arn = create_target_group_response["TargetGroups"][0]["TargetGroupArn"]
 
@@ -139,7 +140,6 @@ def deploy_new_ecs_service(cluster, stack_definition, service):
                 "cluster": cluster,
                 "serviceName": service.name,
                 "taskDefinition": family,
-                # "role": "ecs-service-role" if len(load_balancers) > 0 else "",
                 "desiredCount": service.desired_count,
                 "deploymentConfiguration": service.deployment_configuration.to_aws_json(),
                 "loadBalancers": load_balancers,
