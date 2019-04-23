@@ -10,7 +10,7 @@ route53 = boto3.client("route53")
 autoscaling = boto3.client("autoscaling")
 
 
-def deploy_new_ecs_service(cluster, stack_definition, service):
+def deploy_new_ecs_service(cluster, stack_definition, service, update_only):
 
     family = "%s-%s" % (cluster, service.name)
     print("registering container: %s" % service.name)
@@ -24,7 +24,7 @@ def deploy_new_ecs_service(cluster, stack_definition, service):
         describe_services_response = ecs.describe_services(cluster=cluster, services=[service.name])
 
         load_balancers = []
-        if service.elb:
+        if service.elb and not update_only:
 
             elb_name = "{}{}-lb".format(family, "-{}".format(service.elb.name) if len(service.elb.name) > 0 else "")
 
@@ -134,7 +134,7 @@ def deploy_new_ecs_service(cluster, stack_definition, service):
 
             print("update service_definition: %s response: %s" % (service.name, update_service_response.get("ResponseMetadata", {}).get("HTTPStatusCode")))
 
-        else:
+        elif not update_only:
 
             svc_def = {
                 "cluster": cluster,

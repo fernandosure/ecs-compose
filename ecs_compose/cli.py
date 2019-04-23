@@ -28,7 +28,8 @@ def service():
 @click.argument("cluster")
 @click.option("-f", "--stackfile", required=True, type=click.File("rb"), multiple=True, default="stackfile.yml", help="the name of the stackfile")
 @click.option("--redeploy", is_flag=True, default=False, help="If you want to force a new deploy using its current settings")
-def deploy(cluster, stackfile, redeploy):
+@click.option("--update-only", is_flag=True, default=False, help="Update only mode (it will not create any resources (lb, service discovery, etc)")
+def deploy(cluster, stackfile, redeploy, update_only):
     client = EcsClient()
     ecs_cluster = client.get_single_cluster(cluster)
 
@@ -59,7 +60,7 @@ def deploy(cluster, stackfile, redeploy):
             else:
                 click.secho("skipping deployment for {} there are no new changes in the taskDefinition".format(service.name))
         else:
-            deploy_new_ecs_service(cluster, stack_definition, svc)
+            deploy_new_ecs_service(cluster, stack_definition, svc, update_only)
 
 
 @cluster.command()
