@@ -108,7 +108,7 @@ class ServiceDefinition(object):
         self.elb = ElbDefinition(self.json.get("elb")) if self.json.get("elb") else None
         self.dns_discovery = DNSServiceDiscovery(self.json.get("dns_discovery")) if self.json.get("dns_discovery") else None
 
-        regex = re.compile("([0-9]{4}):([0-9]{4})")
+        regex = re.compile("([0-9]+):([0-9]+)")
         self.ports = [{"hostPort": int(x.group(1)), "containerPort": int(x.group(2))} for y in self.json.get("ports", []) for x in [regex.search(y)] if x]
 
         regex = re.compile("(.+):(.+):(.+)")

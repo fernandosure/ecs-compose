@@ -26,6 +26,11 @@ class StackDefinitionTestCase(unittest.TestCase):
     def test_nginx_should_exist(self):
         self.assertIsNotNone(next((x for x in self.sd.services if x.name == "nginx"), None))
 
+    def test_nginx_should_export_ports(self):
+        svc = next((x for x in self.sd.services if x.name == "nginx"), None)
+        self.assertEqual(svc.ports[0]["hostPort"], 80)
+        self.assertEqual(svc.ports[0]["containerPort"], 80)
+
     def test_healthcheck_should_exist_in_service_A(self):
         svc = next((x for x in self.sd.services if x.name == "service_A"), None)
         self.assertEqual(svc.healthcheck.to_aws_json().get('command'), ['CMD-SHELL', 'sh healthcheck.sh'])

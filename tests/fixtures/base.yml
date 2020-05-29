@@ -68,7 +68,7 @@ services:
   - nginx:
       image: nginx:latest
       ports:
-        - "8080:8080"
+        - "80:80"
       environment:
         - PORT: 8080
       desired_count: 1
