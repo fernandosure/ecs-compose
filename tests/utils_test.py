@@ -22,6 +22,16 @@ class UtilsTestCase(unittest.TestCase):
         })
 
         old_td = EcsTaskDefinition({
+                'placementConstraints': [
+                    {
+                        'expression': 'attribute:ecs.instance-type =~ p3.*',
+                        'type': 'memberOf'
+                    },
+                    {
+                        'expression': 'attribute:ecs.availability-zone == us-east-1a',
+                        'type': 'memberOf'
+                    }
+                ],
                 'containerDefinitions': [
                     {
                         'name': 'service_A',
@@ -106,3 +116,42 @@ class UtilsTestCase(unittest.TestCase):
 
         rs = get_ecs_service_diff(old_svc, old_td, new_svc)
         self.assertIsNone(rs.get(u'healthcheck'))
+
+    def test_there_should_be_difference_in_placement_constraints(self):
+        new_svc = next((x for x in self.sd.services if x.name == "service_A"), None)
+
+        old_svc = EcsService({
+            'serviceName': 'service_A',
+            'desiredCount': 1,
+        })
+
+        old_td = EcsTaskDefinition({
+                'placementConstraints': [
+                    {
+                        'expression': 'attribute:ecs.instance-type =~ g4dn.*',
+                        'type': 'memberOf'
+                    }
+                ],
+                'containerDefinitions': [
+                    {
+                        'name': 'service_A',
+                        'image': 'xxx/service_A:latest',
+                        'environment': [
+                            {'name': 'PORT', 'value': '8888'},
+                            {'name': 'JAVA_OPTS', 'value': '-Duser.timezone="UTC" -Xms256m -Xmx322m -XX:MetaspaceSize=64m -XX:MaxMetaspaceSize=135m -XX:CompressedClassSpaceSize=16m -XX:ReservedCodeCacheSize=50m'},
+                            {'name': 'SPRING_PROFILES_ACTIVE', 'value': 'dev,ecs,standalone'},
+                            {'name': 'LOGGING_LEVEL_ROOT', 'value': 'INFO'},
+                        ],
+                        'healthCheck': {
+                            'command': ['CMD-SHELL', 'sh healthcheck.sh'],
+                            'interval': 30,
+                            'timeout': 5,
+                            'retries': 3,
+                            'startPeriod': 60
+                        }
+                    }
+                ]
+            })
+
+        rs = get_ecs_service_diff(old_svc, old_td, new_svc)
+        self.assertTrue(rs.get(u'PlacementConstraints'))

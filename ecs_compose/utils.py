@@ -43,4 +43,9 @@ def get_ecs_service_diff(old_service, old_td, new_service):
     if diff(old_healthcheck, new_healthcheck):
         rs[u"healthcheck"] = {u"old": old_healthcheck, u"new": new_healthcheck}
 
+    old_placement_constraints = old_td.get('placementConstraints', [])
+    new_placement_constraints = list(map(lambda item: item.to_aws_json(), new_service.placement_constraints))
+
+    if diff(old_placement_constraints, new_placement_constraints):
+        rs[u"PlacementConstraints"] = {u"old": old_placement_constraints, u"new": new_placement_constraints}
     return rs
