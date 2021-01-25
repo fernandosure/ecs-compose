@@ -98,6 +98,8 @@ class ServiceDefinition(object):
         self.desired_count = self.json.get("desired_count", 1)
         self.image = self.json.get("image")
         self.gpus = self.json.get("gpus", 0)
+        self.task_role_arn = self.json.get("task_role_arn")
+        self.task_execution_role_arn = self.json.get("task_execution_role_arn")
 
         # ENVIRONMENTS
         environment = [{"name": y.keys()[0], "value": expandvars(str(y[y.keys()[0]]))} for y in self.json.get("environment", [])]
@@ -159,6 +161,12 @@ class ServiceDefinition(object):
             } for x in self.volumes],
             "placementConstraints": [ item.to_aws_json() for item in self.placement_constraints ]
         }
+
+        if self.task_role_arn:
+            td["taskRoleArn"] = self.task_role_arn
+
+        if self.task_execution_role_arn:
+            td["executionRoleArn"] = self.task_execution_role_arn
 
         if self.healthcheck:
             td["containerDefinitions"][0]["healthCheck"] = self.healthcheck.to_aws_json()
